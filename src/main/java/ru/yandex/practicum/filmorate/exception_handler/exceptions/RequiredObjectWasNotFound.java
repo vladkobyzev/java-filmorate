@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.exception_handler;
+package ru.yandex.practicum.filmorate.exception_handler.exceptions;
 
 import java.util.function.Supplier;
 

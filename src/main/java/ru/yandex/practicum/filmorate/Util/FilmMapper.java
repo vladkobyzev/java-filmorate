@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.Util;
 
 import org.springframework.jdbc.core.RowMapper;
+import ru.yandex.practicum.filmorate.model.film.Director;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.film.Mpa;
 import ru.yandex.practicum.filmorate.model.user.User;

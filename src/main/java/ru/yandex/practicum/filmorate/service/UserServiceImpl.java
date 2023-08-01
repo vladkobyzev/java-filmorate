@@ -5,10 +5,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.yandex.practicum.filmorate.exception_handler.ValidationException;
+import ru.yandex.practicum.filmorate.exception_handler.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.model.user.User;
 import ru.yandex.practicum.filmorate.repository.UserRepository;
-import ru.yandex.practicum.filmorate.exception_handler.RequiredObjectWasNotFound;
+import ru.yandex.practicum.filmorate.exception_handler.exceptions.RequiredObjectWasNotFound;
 import java.util.*;
 
 @Slf4j
@@ -40,6 +41,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsersFriends(int id) {
         return userRepository.getUsersFriends(id);
+    }
+
+    public List<Film> getRecommendations(int id) {
+        return userRepository.getRecommendations(id);
     }
 
     @Override
@@ -78,5 +83,11 @@ public class UserServiceImpl implements UserService {
     public void deleteFriend(int id, int friendId) {
         userRepository.deleteFriend(id, friendId);
         log.info("User " + id + " deleted user " + friendId + "from friends");
+    }
+
+    @Override
+    public void deleteUserById(int id) {
+        userRepository.deleteUserById(id);
+        log.info("Пользователь с id {} удален", id);
     }
 }

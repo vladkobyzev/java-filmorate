@@ -7,10 +7,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.film.Film;
 import ru.yandex.practicum.filmorate.repository.FilmRepository;
-import ru.yandex.practicum.filmorate.exception_handler.RequiredObjectWasNotFound;
+import ru.yandex.practicum.filmorate.exception_handler.exceptions.RequiredObjectWasNotFound;
 import ru.yandex.practicum.filmorate.model.film.Genre;
 import ru.yandex.practicum.filmorate.model.film.Mpa;
-
 import java.util.List;
 
 @Slf4j
@@ -18,10 +17,12 @@ import java.util.List;
 public class FilmServiceImpl implements FilmService {
 
     private final FilmRepository filmRepository;
+    private final DirectorService directorService;
 
     @Autowired
-    public FilmServiceImpl(@Qualifier("filmRepositoryImpl") FilmRepository filmRepository) {
+    public FilmServiceImpl(@Qualifier("filmRepositoryImpl") FilmRepository filmRepository, DirectorService directorService) {
         this.filmRepository = filmRepository;
+        this.directorService = directorService;
     }
 
     @Override
@@ -46,7 +47,8 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film create(Film film) {
-        return filmRepository.createFilm(film);
+        int filmId = filmRepository.createFilm(film);
+        return getFilm(filmId);
     }
 
     @Override
@@ -100,5 +102,26 @@ public class FilmServiceImpl implements FilmService {
             throw new RequiredObjectWasNotFound("Not Valid mpaId");
         }
         return filmRepository.getMpaById(mpaId);
+    }
+
+    @Override
+    public void deleteFilmById(int id) {
+        filmRepository.deleteFilmById(id);
+        log.info("Фильм с id {} удален", id);
+    }
+
+    public List<Film> getSortedDirectorFilms(int directorId, String sortBy) {
+        directorService.isDirectorExist(directorId);
+        String sortRequest;
+        if("likes".equals(sortBy)) {
+            sortRequest = "SELECT *, (SELECT COUNT(user_id) FROM Likes GROUP BY film_id) AS likes FROM Films " +
+                    "JOIN Mpa ON Films.mpa_id=Mpa.mpa_id " +
+                    "JOIN Film_Director ON Films.film_id=Film_Director.film_id " +
+                    "WHERE director_id = ? ORDER BY likes DESC";
+        } else {
+            sortRequest = "SELECT * FROM Films JOIN Mpa ON Films.mpa_id=Mpa.mpa_id JOIN Film_Director ON " +
+                    "Films.film_id=Film_Director.film_id WHERE director_id = ? ORDER BY releaseDate";
+        }
+        return filmRepository.getSortedDirectorFilms(directorId, sortRequest);
     }
 }

@@ -33,7 +33,10 @@ public class FilmsController {
         return filmServiceImpl.getPopularFilms(Integer.parseInt(count));
     }
 
-
+    @GetMapping("/director/{directorId}")
+    public List<Film> getSortedDirectorFilms(@PathVariable int directorId, @RequestParam String sortBy) {
+        return filmServiceImpl.getSortedDirectorFilms(directorId, sortBy);
+    }
 
 
 
@@ -58,6 +61,11 @@ public class FilmsController {
         filmServiceImpl.deleteLike(filmId, userId);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteFilmById(@PathVariable int id) {
+        filmServiceImpl.deleteFilmById(id);
+    }
+
     private Film buildFilm(Film film) {
         return Film.builder()
                 .id(film.getId())
@@ -67,6 +75,7 @@ public class FilmsController {
                 .duration(film.getDuration())
                 .mpa(film.getMpa())
                 .genres(film.getGenres())
+                .directors(film.getDirectors())
                 .build();
     }
 }
